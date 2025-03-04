@@ -14,6 +14,10 @@ export const extractImages = async (zipBuffer: Buffer) => {
       stream
         .pipe(unzipper.Parse())
         .on("entry", async (entry: unzipper.Entry) => {
+          if (entry.path.match(/^(\.|__MACOSX)/)) {
+            entry.autodrain();
+            return;
+          }
           if (entry.type === "Directory") {
             entry.autodrain();
             return;
