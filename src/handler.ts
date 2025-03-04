@@ -8,10 +8,6 @@ export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    console.log(event);
-    console.log("EVENTO", event.body);
-    console.log("HEADERS", event.headers["content-type"]);
-    console.log(event.headers["content-type"]?.includes("multipart/form-data"));
     if (
       !event.body ||
       !event.headers["content-type"]?.includes("multipart/form-data")

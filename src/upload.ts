@@ -10,9 +10,7 @@ export const uploadImagesToS3 = async (
     throw new Error("Variável de ambiente S3_BUCKET_NAME não definida.");
   }
 
-  const uploadedFiles: string[] = [];
-
-  for (const image of images) {
+  const uploadPromises = images.map((image) => {
     const extension = image.name.split(".").pop()?.toLowerCase();
     let contentType = "image/jpeg";
     if (extension === "png") {
@@ -29,12 +27,15 @@ export const uploadImagesToS3 = async (
       Key: `${image.name}`,
       Body: image.content,
       ContentType: contentType,
-      ACL: "public-read"
+      ACL: "public-read", // Define permissão de leitura pública
     };
 
-    await s3.upload(uploadParams).promise();
-    uploadedFiles.push(image.name);
-  }
+    return s3.upload(uploadParams).promise();
+  });
 
-  return uploadedFiles;
+  // Aguarda todos os uploads serem concluídos
+  await Promise.all(uploadPromises);
+
+  // Retorna os nomes das imagens enviadas
+  return images.map((image) => image.name);
 };
