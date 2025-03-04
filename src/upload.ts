@@ -4,7 +4,7 @@ const s3 = new AWS.S3();
 
 export const uploadImagesToS3 = async (
   images: { name: string; content: Buffer }[],
-  s3Path: string
+  _s3Path?: string
 ): Promise<string[]> => {
   if (!process.env.S3_BUCKET_NAME) {
     throw new Error("Variável de ambiente S3_BUCKET_NAME não definida.");
@@ -17,17 +17,16 @@ export const uploadImagesToS3 = async (
     let contentType = "image/jpeg";
     if (extension === "png") {
       contentType = "image/png";
-    } 
-    if(extension === "webp") {
-      contentType = "image/webp";
     }
-    else if (extension === "jpeg" || extension === "jpg") {
+    if (extension === "webp") {
+      contentType = "image/webp";
+    } else if (extension === "jpeg" || extension === "jpg") {
       contentType = "image/jpeg";
     }
 
     const uploadParams = {
       Bucket: process.env.S3_BUCKET_NAME!,
-      Key: `${s3Path}/${image.name}`,
+      Key: `${image.name}`,
       Body: image.content,
       ContentType: contentType,
     };
