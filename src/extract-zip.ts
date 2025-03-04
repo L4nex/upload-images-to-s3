@@ -1,4 +1,5 @@
 import unzipper from "unzipper";
+import { Readable } from "stream";
 
 export const extractImages = async (zipBuffer: Buffer) => {
   if (!zipBuffer || zipBuffer.length === 0) {
@@ -6,15 +7,33 @@ export const extractImages = async (zipBuffer: Buffer) => {
   }
 
   try {
-    const directory = await unzipper.Open.buffer(zipBuffer);
-    return Promise.all(
-      directory.files
-        .filter((file) => file.path.match(/\.(jpg|jpeg|png)$/i)) // Filtra só imagens
-        .map(async (file) => ({
-          name: file.path,
-          content: await file.buffer(),
-        }))
-    );
+    const images: any = [];
+    const stream = Readable.from(zipBuffer);
+
+    await new Promise((resolve, reject) => {
+      stream
+        .pipe(unzipper.Parse())
+        .on("entry", async (entry: unzipper.Entry) => {
+          if (entry.type === "Directory") {
+            entry.autodrain();
+            return;
+          }
+
+          if (entry.path.match(/\.(jpg|jpeg|png|webp)$/i)) {
+            const content = await entry.buffer();
+            images.push({
+              name: entry.path,
+              content,
+            });
+          } else {
+            entry.autodrain();
+          }
+        })
+        .on("finish", resolve)
+        .on("error", reject);
+    });
+
+    return images;
   } catch (error: any) {
     throw new Error("Falha ao extrair o arquivo ZIP: " + error.message);
   }

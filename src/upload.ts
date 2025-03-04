@@ -17,7 +17,11 @@ export const uploadImagesToS3 = async (
     let contentType = "image/jpeg";
     if (extension === "png") {
       contentType = "image/png";
-    } else if (extension === "jpeg" || extension === "jpg") {
+    } 
+    if(extension === "webp") {
+      contentType = "image/webp";
+    }
+    else if (extension === "jpeg" || extension === "jpg") {
       contentType = "image/jpeg";
     }
 
