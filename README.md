@@ -7,6 +7,10 @@ Este projeto é uma função AWS Lambda que permite o upload de arquivos ZIP con
 - Node.js v22
 - Yarn
 
+## Entradas
+
+- Espera um arquivo zipado contendo imagens que podem ou não estar organizadas dentro de pastas com o body sendo um multipart/form-data e o nome do atributo do arquivo sendo `file`
+
 ## Arquivos Principais
 
 - **src/handler.ts**: Função Lambda principal que lida com o upload do arquivo ZIP, extração das imagens e upload para o S3.
