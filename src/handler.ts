@@ -15,7 +15,7 @@ export const handler = async (
       return {
         statusCode: 400,
         body: JSON.stringify({
-          error: "Nenhum arquivo enviado ou Content-Type inválido",
+          error: "Nenhum arquivo enviado ou content-type inválido, esperado multipart/form-data",
         }),
       };
     }
@@ -24,13 +24,6 @@ export const handler = async (
     const busboy = Busboy({ headers: { "content-type": contentType } });
 
     let fileBuffer: Buffer | null = null;
-    let path: string | null = null;
-
-    busboy.on("field", (fieldname, value) => {
-      if (fieldname === "path") {
-        path = value;
-      }
-    });
 
     busboy.on("file", (fieldname, file) => {
       if (fieldname === "file") {
@@ -59,15 +52,15 @@ export const handler = async (
       busboy.on("error", reject);
     });
 
-    if (!fileBuffer || !path) {
+    if (!fileBuffer) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: "Arquivo ou caminho não encontrado" }),
+        body: JSON.stringify({ error: "Arquivo não encontrado" }),
       };
     }
 
     const images = await extractImages(fileBuffer);
-    const uploadedFiles = await uploadImagesToS3(images, path);
+    const uploadedFiles = await uploadImagesToS3(images);
 
     return {
       statusCode: 200,
