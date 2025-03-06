@@ -43,24 +43,24 @@ Este projeto é uma função AWS Lambda que permite o upload de arquivos ZIP con
 
 2. **Deploy**
 
-   - Para fazer upload dos lambdas é necessário:
+   - Para fazer upload dos lambdas é necessário executar os seguintos comandos:
 
-     **src/handler.ts**
-     rodar os comandos
+     **src/handler.ts**:
      `npx tsc`
-     `zip -r lambda.zip dist/auth-middleware.js dist/extract-zip.js dist/upload.js dist/handler.js node_modules`
+     `zip -r upload.zip dist/auth-middleware.js dist/extract-zip.js dist/upload.js dist/handler.js node_modules`
 
      **src/generate-token-handler.ts**
+     `npx tsc`
      `zip -r generate-token.zip dist/generate-token-handler.js node_modules`
 
 3. **Configurar Variáveis de Ambiente**:
 
    - Variáveis necessárias:
 
-   **src/handler.ts** são necessárias as variáveis de ambiente `S3_BUCKET_NAME`, `JWT_SECRET`
-   **src/generate-token-handler.ts** são necessárias as variáveis de ambiente `JWT_SECRET`, `USERNAME`, `PASSWORD`
+   **src/handler.ts**: são necessárias as variáveis de ambiente `S3_BUCKET_NAME`, `JWT_SECRET`
+   **src/generate-token-handler.ts**: são necessárias as variáveis de ambiente `JWT_SECRET`, `USERNAME`, `PASSWORD`
 
 4. **Sugestão de configuração do lambda**
 
-   - Aumente a memória do Lambda para 256 MB ou 512 MB para melhorar o desempenho.
-   - Configure Provisioned Concurrency para reduzir o tempo de cold start.
+   - Aumente a memória do Lambda para 256 MB ou 512 MB para melhorar o desempenho (**src/handler.ts**).
+   - Configure o Provisioned Concurrency para reduzir o tempo de cold start.
