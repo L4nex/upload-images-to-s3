@@ -7,13 +7,13 @@ AWS Lambda para upload, extração e armazenamento de imagens em um bucket S3, c
 ✅ **Upload seguro** de arquivos ZIP contendo imagens  
 ✅ **Extração automática** das imagens dentro do ZIP  
 ✅ **Armazenamento no Amazon S3**  
-✅ **Proteção com JWT** para garantir segurança no acesso  
+✅ **Proteção com JWT** para garantir segurança no acesso
 
 ---
 
 ## 📌 Pré-requisitos
 
-- **Node.js** v22  
+- **Node.js** v22
 - **Yarn** (Gerenciador de pacotes)
 
 ---
@@ -29,7 +29,7 @@ AWS Lambda para upload, extração e armazenamento de imagens em um bucket S3, c
 ### 🔹 Autenticação
 
 - Para realizar o upload, é necessário um **token JWT válido**.
-- O token deve ser enviado no cabeçalho da requisição:  
+- O token deve ser enviado no cabeçalho da requisição:
 
   ```http
   Authorization: Bearer <seu_token_jwt>
@@ -46,18 +46,18 @@ AWS Lambda para upload, extração e armazenamento de imagens em um bucket S3, c
 ├── 📜 `extract-zip.ts` → Extrai imagens do arquivo ZIP  
 ├── 📜 `upload.ts` → Faz o upload das imagens extraídas para o S3  
 ├── 📜 `generate-token-handler.ts` → Gera um token JWT com usuário e senha  
-└── 📜 `auth-middleware.ts` → Middleware para validar o JWT  
+└── 📜 `auth-middleware.ts` → Middleware para validar o JWT
 
 ---
 
 ## 📦 Dependências
 
-| Pacote          | Descrição                                   |
-|----------------|-------------------------------------------|
-| `aws-sdk`      | Interação com serviços da AWS           |
-| `busboy`       | Processamento de formulários multipart  |
-| `unzipper`     | Extração de arquivos ZIP                |
-| `jsonwebtoken` | Geração e validação de tokens JWT       |
+| Pacote         | Descrição                              |
+| -------------- | -------------------------------------- |
+| `aws-sdk`      | Interação com serviços da AWS          |
+| `busboy`       | Processamento de formulários multipart |
+| `unzipper`     | Extração de arquivos ZIP               |
+| `jsonwebtoken` | Geração e validação de tokens JWT      |
 
 ---
 
@@ -72,12 +72,14 @@ yarn install
 ### 🔹 2. Build e empacotamento dos Lambdas
 
 #### **Lambda de Upload (`handler.ts`)**
+
 ```sh
 npx tsc
 zip -r upload.zip dist/auth-middleware.js dist/extract-zip.js dist/upload.js dist/handler.js node_modules
 ```
 
 #### **Lambda de Geração de Token (`generate-token-handler.ts`)**
+
 ```sh
 npx tsc
 zip -r generate-token.zip dist/generate-token-handler.js node_modules
@@ -85,15 +87,15 @@ zip -r generate-token.zip dist/generate-token-handler.js node_modules
 
 ### 🔹 3. Configurar Variáveis de Ambiente
 
-| Lambda                      | Variáveis Requeridas                       |
-|-----------------------------|-------------------------------------------|
-| **Upload (`handler.ts`)**  | `S3_BUCKET_NAME`, `JWT_SECRET`          |
-| **Token (`generate-token-handler.ts`)**  | `JWT_SECRET`, `USERNAME`, `PASSWORD` |
+| Lambda                                  | Variáveis Requeridas                 |
+| --------------------------------------- | ------------------------------------ |
+| **Upload (`handler.ts`)**               | `S3_BUCKET_NAME`, `JWT_SECRET`       |
+| **Token (`generate-token-handler.ts`)** | `JWT_SECRET`, `USERNAME`, `PASSWORD` |
 
 ### 🔹 4. Ajustes Recomendados no AWS Lambda
 
-- **Ajustar memória** para **256MB ou 512MB** para melhor desempenho  
-- **Habilitar Provisioned Concurrency** para reduzir o tempo de cold start  
+- **Ajustar memória** para **256MB ou 512MB** para melhor desempenho
+- **Habilitar Provisioned Concurrency** para reduzir o tempo de cold start
 
 ---
 
@@ -112,6 +114,7 @@ Content-Type: application/json
 ```
 
 🔹 **Resposta esperada:**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsIn..."
@@ -126,10 +129,22 @@ Authorization: Bearer <seu_token_jwt>
 Content-Type: multipart/form-data
 ```
 
+🔹 **Resposta esperada:**
+
+```json
+{
+  "statusCode": 200,
+  "body": {
+    "message": "Upload concluído",
+    "files": ["imagem1.jpg", "imagem2.png"]
+  }
+}
+```
+
 ---
 
 ## 📌 Observações
 
-- Certifique-se de que **as permissões do bucket S3 estejam corretas** para o upload.  
-- Tokens JWT **expiram** após um período de 12 horas – gere um novo quando necessário.  
+- Certifique-se de que **as permissões do bucket S3 estejam corretas** para o upload.
+- Tokens JWT **expiram** após um período de 12 horas – gere um novo quando necessário.
 - Para fins de segurança, **nunca exponha o `JWT_SECRET` publicamente**.
