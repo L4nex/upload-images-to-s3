@@ -1,66 +1,135 @@
-# Lambda Zip Upload
+# 📦 Lambda Zip Upload
 
-Este projeto é uma função AWS Lambda que permite o upload de arquivos ZIP contendo imagens, extrai as imagens do arquivo ZIP e as envia para um bucket S3. Além disso, inclui um sistema de autenticação baseado em tokens JWT para proteger o acesso à função de upload.
+AWS Lambda para upload, extração e armazenamento de imagens em um bucket S3, com autenticação JWT para controle de acesso.
 
-## Pré-requisitos
+## 🚀 Funcionalidades
 
-- Node.js v22
-- Yarn
+✅ **Upload seguro** de arquivos ZIP contendo imagens  
+✅ **Extração automática** das imagens dentro do ZIP  
+✅ **Armazenamento no Amazon S3**  
+✅ **Proteção com JWT** para garantir segurança no acesso  
 
-## Entradas
+---
 
-- **Upload de Imagens**:
+## 📌 Pré-requisitos
 
-  - Espera um arquivo zipado contendo imagens que podem ou não estar organizadas dentro de pastas.
-  - O corpo da requisição deve ser um `multipart/form-data`, com o nome do atributo do arquivo sendo `file`.
+- **Node.js** v22  
+- **Yarn** (Gerenciador de pacotes)
 
-- **Autenticação**:
-  - Para acessar a função de upload, é necessário fornecer um token JWT válido no cabeçalho `Authorization` da requisição.
-  - O token pode ser gerado chamando o handler `generate-token-handler` com um usuário e senha válidos.
+---
 
-## Arquivos Principais
+## 📥 Entradas
 
-- **src/handler.ts**: Função Lambda principal que lida com o upload do arquivo ZIP, extração das imagens e upload para o S3.
-- **src/extract-zip.ts**: Função que extrai imagens de um arquivo ZIP.
-- **src/upload.ts**: Função que faz o upload das imagens extraídas para um bucket S3.
-- **src/generate-token-handler.ts**: Função Lambda que gera um token JWT com base em um usuário e senha.
-- **src/auth-middleware.ts**: Middleware que valida o token JWT antes de permitir o acesso à função de upload.
+### 🔹 Upload de Imagens
 
-## Dependências
+- O arquivo enviado **deve ser um ZIP** contendo imagens.
+- As imagens podem estar organizadas dentro de pastas.
+- A requisição deve ser **multipart/form-data**, com o campo do arquivo nomeado como `file`.
 
-- `aws-sdk`: SDK da AWS para interagir com os serviços da AWS.
-- `busboy`: Biblioteca para analisar formulários multipart.
-- `unzipper`: Biblioteca para descompactar arquivos ZIP.
-- `jsonwebtoken`: Biblioteca para gerar e validar tokens JWT.
+### 🔹 Autenticação
 
-## Configuração
+- Para realizar o upload, é necessário um **token JWT válido**.
+- O token deve ser enviado no cabeçalho da requisição:  
 
-1. **Instalar Dependências**:
+  ```http
+  Authorization: Bearer <seu_token_jwt>
+  ```
 
-   ```sh
-   yarn install
-   ```
+- O token pode ser gerado chamando a função `generate-token-handler`, fornecendo um **usuário e senha válidos**.
 
-2. **Deploy**
+---
 
-   - Para fazer upload dos lambdas é necessário executar os seguintos comandos:
+## 📂 Estrutura do Projeto
 
-     **src/handler.ts**:
-     `npx tsc`
-     `zip -r upload.zip dist/auth-middleware.js dist/extract-zip.js dist/upload.js dist/handler.js node_modules`
+📁 **src/**  
+├── 📜 `handler.ts` → Função principal do Lambda (upload, extração e envio ao S3)  
+├── 📜 `extract-zip.ts` → Extrai imagens do arquivo ZIP  
+├── 📜 `upload.ts` → Faz o upload das imagens extraídas para o S3  
+├── 📜 `generate-token-handler.ts` → Gera um token JWT com usuário e senha  
+└── 📜 `auth-middleware.ts` → Middleware para validar o JWT  
 
-     **src/generate-token-handler.ts**
-     `npx tsc`
-     `zip -r generate-token.zip dist/generate-token-handler.js node_modules`
+---
 
-3. **Configurar Variáveis de Ambiente**:
+## 📦 Dependências
 
-   - Variáveis necessárias:
+| Pacote          | Descrição                                   |
+|----------------|-------------------------------------------|
+| `aws-sdk`      | Interação com serviços da AWS           |
+| `busboy`       | Processamento de formulários multipart  |
+| `unzipper`     | Extração de arquivos ZIP                |
+| `jsonwebtoken` | Geração e validação de tokens JWT       |
 
-   **src/handler.ts**: são necessárias as variáveis de ambiente `S3_BUCKET_NAME`, `JWT_SECRET`
-   **src/generate-token-handler.ts**: são necessárias as variáveis de ambiente `JWT_SECRET`, `USERNAME`, `PASSWORD`
+---
 
-4. **Sugestão de configuração do lambda**
+## ⚙️ Configuração e Deploy
 
-   - Aumente a memória do Lambda para 256 MB ou 512 MB para melhorar o desempenho (**src/handler.ts**).
-   - Configure o Provisioned Concurrency para reduzir o tempo de cold start.
+### 🔹 1. Instalar dependências
+
+```sh
+yarn install
+```
+
+### 🔹 2. Build e empacotamento dos Lambdas
+
+#### **Lambda de Upload (`handler.ts`)**
+```sh
+npx tsc
+zip -r upload.zip dist/auth-middleware.js dist/extract-zip.js dist/upload.js dist/handler.js node_modules
+```
+
+#### **Lambda de Geração de Token (`generate-token-handler.ts`)**
+```sh
+npx tsc
+zip -r generate-token.zip dist/generate-token-handler.js node_modules
+```
+
+### 🔹 3. Configurar Variáveis de Ambiente
+
+| Lambda                      | Variáveis Requeridas                       |
+|-----------------------------|-------------------------------------------|
+| **Upload (`handler.ts`)**  | `S3_BUCKET_NAME`, `JWT_SECRET`          |
+| **Token (`generate-token-handler.ts`)**  | `JWT_SECRET`, `USERNAME`, `PASSWORD` |
+
+### 🔹 4. Ajustes Recomendados no AWS Lambda
+
+- **Ajustar memória** para **256MB ou 512MB** para melhor desempenho  
+- **Habilitar Provisioned Concurrency** para reduzir o tempo de cold start  
+
+---
+
+## 🎯 Exemplo de Uso
+
+### 🔹 Gerar Token JWT
+
+```http
+POST /sua-rota
+Content-Type: application/json
+
+{
+  "username": "meu_usuario",
+  "password": "minha_senha"
+}
+```
+
+🔹 **Resposta esperada:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsIn..."
+}
+```
+
+### 🔹 Upload de Arquivo ZIP
+
+```http
+POST /sua-rota
+Authorization: Bearer <seu_token_jwt>
+Content-Type: multipart/form-data
+```
+
+---
+
+## 📌 Observações
+
+- Certifique-se de que **as permissões do bucket S3 estejam corretas** para o upload.  
+- Tokens JWT **expiram** após um período de 12 horas – gere um novo quando necessário.  
+- Para fins de segurança, **nunca exponha o `JWT_SECRET` publicamente**.
