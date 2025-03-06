@@ -3,11 +3,19 @@ import Busboy from "busboy";
 import { Readable } from "stream";
 import { extractImages } from "./extract-zip";
 import { uploadImagesToS3 } from "./upload";
+import { validateToken } from "./auth-middleware";
 
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
+    if (!validateToken(event)) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ error: "Token inválido ou não fornecido" }),
+      };
+    }
+
     if (
       !event.body ||
       !event.headers["content-type"]?.includes("multipart/form-data")
@@ -15,7 +23,8 @@ export const handler = async (
       return {
         statusCode: 400,
         body: JSON.stringify({
-          error: "Nenhum arquivo enviado ou content-type inválido, esperado multipart/form-data",
+          error:
+            "Nenhum arquivo enviado ou content-type inválido, esperado multipart/form-data",
         }),
       };
     }

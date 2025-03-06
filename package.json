@@ -1,18 +1,20 @@
 {
   "name": "lambda-zip-upload",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/handler.ts",
   "license": "MIT",
   "dependencies": {
-    "@types/busboy": "^1.5.4",
     "aws-sdk": "^2.1692.0",
     "busboy": "^1.6.0",
+    "jsonwebtoken": "^9.0.2",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
     "@types/node": "^22.13.8",
     "@types/unzipper": "^0.10.11",
+    "@types/busboy": "^1.5.4",
+    "@types/jsonwebtoken": "^9.0.9",
     "typescript": "^5.8.2"
   }
 }
