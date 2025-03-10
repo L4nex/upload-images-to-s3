@@ -1,6 +1,6 @@
 # Node.js
 node_modules/
-lambda.zip
+upload.zip
 generate-token.zip
 dist/
 .env

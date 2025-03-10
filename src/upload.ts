@@ -10,22 +10,10 @@ export const uploadImagesToS3 = async (
   }
 
   const uploadPromises = images.map((image) => {
-    const extension = image.name.split(".").pop()?.toLowerCase();
-
-    const mimeTypes: Record<string, string> = {
-      png: "image/png",
-      webp: "image/webp",
-      jpeg: "image/jpeg",
-      jpg: "image/jpeg",
-    };
-
-    const contentType = mimeTypes[extension ?? "jpeg"];
-
     const uploadParams = {
       Bucket: process.env.S3_BUCKET_NAME!,
       Key: `${image.name}`,
       Body: image.content,
-      ContentType: contentType,
       ACL: "public-read",
     };
 

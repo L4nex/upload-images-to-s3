@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import Busboy from "busboy";
 import { Readable } from "stream";
-import { extractImages } from "./extract-zip";
+import { extractFiles } from "./extract-zip";
 import { uploadImagesToS3 } from "./upload";
 import { validateToken } from "./auth-middleware";
 
@@ -68,7 +68,7 @@ export const handler = async (
       };
     }
 
-    const images = await extractImages(fileBuffer);
+    const images = await extractFiles(fileBuffer);
     const uploadedFiles = await uploadImagesToS3(images);
 
     return {
