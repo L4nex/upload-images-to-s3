@@ -10,12 +10,25 @@ export const uploadImagesToS3 = async (
   }
 
   const uploadPromises = images.map((image) => {
-    const uploadParams = {
+    const extension = image.name.split(".").pop()?.toLowerCase();
+
+    const mimeTypes: Record<string, string> = {
+      png: "image/png",
+      webp: "image/webp",
+      jpeg: "image/jpeg",
+      jpg: "image/jpeg",
+    };
+
+    const uploadParams: AWS.S3.PutObjectRequest = {
       Bucket: process.env.S3_BUCKET_NAME!,
       Key: `${image.name}`,
       Body: image.content,
       ACL: "public-read",
     };
+
+    if (extension && mimeTypes[extension]) {
+      uploadParams.ContentType = mimeTypes[extension];
+    }
 
     return s3.upload(uploadParams).promise();
   });

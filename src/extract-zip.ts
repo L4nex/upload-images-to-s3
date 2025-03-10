@@ -14,11 +14,9 @@ export const extractFiles = async (zipBuffer: Buffer) => {
       stream
         .pipe(unzipper.Parse())
         .on("entry", async (entry: unzipper.Entry) => {
-          if (entry.path.match(/^(\.|__MACOSX)/)) {
-            entry.autodrain();
-            return;
-          }
-          if (entry.type === "Directory") {
+          const isHiddenFileOrFolder = entry.path.split("/").some((part) => part.startsWith(".") || part.startsWith("__MACOSX"));
+
+          if (isHiddenFileOrFolder || entry.type === "Directory") {
             entry.autodrain();
             return;
           }
